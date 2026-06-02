@@ -7,7 +7,7 @@ const CustomHeader = ({ title, description }: Props) => {
   return (
     <header className="content-center">
       <h1>{title}</h1>
-      {description ? <p>{description}</p> : <p>No existe descripcion</p>}
+      {description && <p>{description}</p>}
     </header>
   );
 };
