@@ -33,6 +33,9 @@ const useGifs = () => {
     }
     const gifs = await getGifsByQuery(term);
     setGifsList(gifs);
+
+    const myExplicitTypingGifs: Gif[] = gifs;
+    gifsCache.current[term] = myExplicitTypingGifs;
   };
 
   const handleSearch = async (query: string = '') => {
@@ -44,12 +47,10 @@ const useGifs = () => {
 
     const gifs = await getGifsByQuery(query);
     setGifsList(gifs);
-    console.log({ gifs });
+
     //Aca guardo el dato para el objeto que es (key: value) con el .current(de useRef()) y el operador de asignacion(=) necesario para la introduccion de un dato(key: value) dentro de un objeto.
     const myExplicitTypingGifs: Gif[] = gifs;
     gifsCache.current[query] = myExplicitTypingGifs;
-
-    console.log(gifsCache);
   };
 
   return {
