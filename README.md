@@ -1,75 +1,145 @@
-# React + TypeScript + Vite
+# gif-app
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## URL:
 
-Currently, two official plugins are available:
+https://miltoncoronado.github.io/GifApp/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Overview
 
-## React Compiler
+gif-app is a small React + TypeScript application that searches and displays GIFs from the GIPHY API. It is structured to separate presentational UI, domain logic, API clients, and tests to make the codebase easy to maintain, extend, and test.
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+## Design intent
 
-Note: This will impact Vite dev & build performances.
+- Clear separation of concerns: UI vs business logic vs API layer.
+- Reusable shared components for generic UI elements.
+- Focused modules for GIF-related domain logic (search, state, API adapters).
+- Hooks encapsulate stateful logic and side effects so components stay presentational and easy to test.
 
-## Expanding the ESLint configuration
+## Component separation
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Shared (src/shared)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Purpose: generic, UI-focused components that are not GIF-specific.
+- Examples: SearchBar, CustomHeader.
+- Location: src/shared/components
+- Why: promotes reuse across different parts of the app and keeps GIF logic isolated.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Gifs (src/gifs)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Purpose: all logic and components directly related to searching, fetching and displaying GIFs.
+- Subfolders:
+  - components — GifList, PreviousSearches (presentational components tied to GIFs)
+  - hooks — useGifs (state management and side effects)
+  - actions — orchestration functions like get-gif-by-query.action.ts
+  - api — giphy.api.ts (HTTP client adapter)
+  - interfaces — domain typings for GIFs and Giphy responses
+- Why: keeps domain-specific responsibilities colocated and easier to test or replace.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## API and environment
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- API client: src/gifs/api/giphy.api.ts
+- API key: read from environment variable VITE_GIPHY_API_KEY (see .env.template)
+- Example: add .env at project root with VITE_GIPHY_API_KEY=your_key
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Funtions and primary hooks
+
+- useGifs (src/gifs/hooks/useGifs.tsx)
+  - Manages query, gifs list, previous searches and loading state.
+  - Exposes functions to trigger searches and update local state.
+- getGifByQuery (src/gifs/actions/get-gif-by-query.action.ts)
+  - Business orchestrator: calls giphy.api, maps responses into domain GIFs, handles pagination/limit.
+
+## Internal functions and responsibilities
+
+- giphy.api.ts: HTTP wrapper for GIPHY endpoints, normalizes HTTP responses.
+- get-gif-by-query.action.ts: maps API responses to the app domain and handles small business rules.
+- useGifs.tsx:
+
+## Testing strategy
+
+- Test runner: Vitest (configured in vite.config.ts). Tests run in a jsdom environment.
+- Unit tests:
+  - Hooks: src/gifs/hooks/useGif.test.ts
+  - Actions: src/gifs/actions/get-gif-by-query.action.test.ts
+  - API client: src/gifs/api/giphy.api.test.ts
+  - Shared components: src/shared/components/\*.test.tsx
+- Mocks: tests/mocks/giphy.response.data.ts used to stub GIPHY responses in unit tests.
+- Snapshots: located in src/shared/components/**snapshots** and other **snapshots** folders.
+- Coverage: vitest can generate coverage reports via --coverage.
+
+## Important files and locations
+
+- src/gifs/actions/get-gif-by-query.action.ts
+- src/gifs/api/giphy.api.ts
+- src/gifs/components/GifList.tsx
+- src/gifs/components/PreviousSearches.tsx
+- src/gifs/hooks/useGifs.tsx
+- src/shared/components/SearchBar.tsx
+- src/shared/components/CustomHeader.tsx
+- tests/mocks/giphy.response.data.ts
+- package.json (all the dependencies live here)
+- vite.config.ts (Vitest config + base path)
+
+## Project structure (short)
+
+- src/
+  - counter/ (Sandbox/demo code)
+  - gifs/
+    - actions/
+    - api/
+    - components/
+    - hooks/
+    - interfaces/
+  - shared/
+    - components/
+- tests/mocks/
+- .env
+- .env.template
+- package.json
+- vite.config.ts
+
+## How to run (development)
+
+1. Install dependencies:
+   - npm install
+2. Add environment variable:
+   - create .env with VITE_GIPHY_API_KEY=your_key
+3. Start dev server:
+   - npm run dev
+4. Open http://localhost:5173 (port may vary)
+
+## How to build
+
+- the app is configured to be deploy with gh-pages an the scripts exist at package.json
+- npm run deploy
+- The app is configured with base: /GifApp/ in vite.config.ts — adjust if deploying under different base path.
+
+## How to test
+
+- Run tests:
+  - npm run test
+- Coverage:
+  - npm run test --coverage
+- to see this at web use test:ui
+  - npm run test:ui
+
+Notes:
+
+- Tests use mocks (tests/mocks/giphy.response.data.ts) to avoid real network calls.
+- Vitest environment is configured to jsdom in vite.config.ts.
+
+## Contributing
+
+- Keep UI components in src/shared/components when they are generic.
+- Keep GIF domain logic inside src/gifs to preserve separation of concerns.
+- Write unit tests for hooks and actions; mock network calls at the API layer.
+
+## Conclusion
+
+gif-app demonstrates a pragmatic separation between generic UI and domain-specific features. Tests are organized to validate hooks, actions and the API client independently, improving reliability and making refactors safer.
+
+## License
+
+Use or adapt as needed.
+
+Software design by Milton Coronado.
