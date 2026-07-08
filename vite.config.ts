@@ -7,5 +7,5 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
   },
-  base: '/GifApp/',
+  base: '/gif-app/',
 });
