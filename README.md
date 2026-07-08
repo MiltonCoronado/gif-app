@@ -2,7 +2,7 @@
 
 ## URL:
 
-https://miltoncoronado.github.io/GifApp/
+https://miltoncoronado.github.io/gif-app/
 
 ## Overview
 
