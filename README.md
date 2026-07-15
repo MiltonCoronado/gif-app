@@ -159,4 +159,4 @@ gif-app demonstrates a pragmatic separation between generic UI and domain-specif
 
 Use or adapt as needed.
 
-Software design by Milton Coronado.
+## Software design by Milton Coronado.
