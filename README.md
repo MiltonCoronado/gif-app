@@ -17,6 +17,22 @@ Hooks encapsulate stateful logic and side effects so components stay presentatio
 
 ## Component separation
 
+# The Problem
+
+In standard React setups, clicking on previous search tags triggers a state change that forces the app to make redundant HTTP requests to GIPHY for data it has already fetched. This wastes network bandwidth and slows down the user experience.
+
+# The Solution
+
+We use a useRef object (gifsCache) acting as a fast, synchronous key-value dictionary (Record<string, Gif[]>).
+
+State Persistence: Since useRef values persist across renders without triggering a re-render when updated, we can write to the cache with zero UI overhead.
+
+Cache Validation: When a user searches for a term or clicks a history tag, the app first sanitizes the string and checks the ref dictionary.
+
+Cache Hit: The app instantly loads the GIFs from memory to the state. Zero API calls are made.
+
+Cache Miss: The app fetches the GIFs from GIPHY, updates the UI, and saves the result to the cache for future clicks.
+
 ### Shared (src/shared)
 
 Purpose: generic, UI-focused components that are not GIF-specific.
